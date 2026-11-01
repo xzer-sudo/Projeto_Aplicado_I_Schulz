@@ -52,9 +52,6 @@ class Tecnico:
         self._nome = self._validar_texto(nome, "nome")
         self._papel = self._validar_papel(papel)
         self._nome_setor = self._validar_texto(nome_setor, "nome_setor")
-        # ATENÇÃO: `matricula` NÃO existe no DDL da AV02.
-        # Fica como atributo de domínio sem persistência (ver seção 7.2
-        # da documentação técnica).
         self._matricula = matricula
 
     # ------------------------- validações -------------------------
@@ -176,11 +173,11 @@ class Equipamento:
     # ---- propriedades de compatibilidade com o roteiro da AV03 ----
   
     def codigo_tag(self) -> str:
-        """Alias de codigo (o roteiro da AV03 cita 'codigo_tag')."""
+
         return self._codigo
 
     def descricao(self) -> str:
-        """Alias de denominacao (o roteiro da AV03 cita 'descricao')."""
+       
         return self._denominacao
 
     def __repr__(self) -> str:
@@ -196,14 +193,6 @@ class Equipamento:
 class Medicao:
     """
     Encapsula o ensaio de calibração.
-
-    Regra de negócio central (dicionário de dados da AV02, seção 2.4):
-        valor_nominal - |tol_menos| <= media <= valor_nominal + |tol_mais|
-
-    `media`, `desvio_padrao` e `status` são SEMPRE calculados aqui e
-    nunca informados externamente. Isso é obrigatório porque a coluna
-    `status` é NOT NULL com CHECK no DDL: o banco rejeitaria um status
-    nulo ou fora da lista.
     """
 
     def __init__(
@@ -247,11 +236,6 @@ class Medicao:
         return str(valor).strip()
 
     def _validar_medida(valor, campo: str) -> float:
-        """
-        RN01 da AV01: medida1 e medida2 são obrigatórias.
-        A planilha manual usava o caractere espaço (' ') em vez de célula
-        vazia, o que quebrava as fórmulas (#VALUE!). Aqui isso é rejeitado.
-        """
         if valor is None or str(valor).strip() in ("", " "):
             raise ErroValidacao(
                 f"Medição pendente: '{campo}' é obrigatória e não pode ser vazia."
@@ -264,10 +248,6 @@ class Medicao:
             ) from exc
 
     def _validar_data(valor) -> str:
-        """
-        Armazena em ISO (AAAA-MM-DD), conforme definido na AV02.
-        Rejeita o placeholder textual '00/00/0000' herdado das planilhas.
-        """
         if valor is None or str(valor).strip() == "":
             return date.today().isoformat()
         if isinstance(valor, (date, datetime)):
@@ -284,11 +264,6 @@ class Medicao:
 
     # ------------------------- regra de negócio -------------------------
     def classificar(self) -> str:
-        """
-        Aplica a regra de tolerância e devolve APROVADO ou REPROVADO.
-        A comparação é INCLUSIVA nos dois extremos: uma leitura exatamente
-        igual ao limite superior é classificada como APROVADO.
-        """
         limite_inferior = self._valor_nominal - self._tol_menos
         limite_superior = self._valor_nominal + self._tol_mais
         return (
@@ -349,12 +324,6 @@ class Medicao:
         return self._data_medicao
 
     def data_medicao_br(self) -> str:
-        """
-        Única conversão para o padrão brasileiro, feita a partir de um
-        objeto de data real — nunca por concatenação de texto livre.
-        Corrige o defeito do certificado 00091/2026, que imprimia
-        'Wednesday' e 'Monday' no lugar das datas (RF13 / RN09).
-        """
         return datetime.strptime(self._data_medicao, "%Y-%m-%d").strftime("%d/%m/%Y")
 
     def __repr__(self) -> str:
@@ -368,14 +337,6 @@ class Medicao:
 # 4. CLASSE DE CONEXÃO E PERSISTÊNCIA
 # =====================================================================
 class ConexaoSQLite:
-    """
-    Gerencia a conexão com o SQLite como gerenciador de contexto.
-
-    O PRAGMA foreign_keys é obrigatório: o SQLite só valida as chaves
-    estrangeiras com essa opção ligada (mesma observação do 03_banco.sql).
-    Sem ele, uma medição poderia ser gravada referenciando um equipamento
-    inexistente.
-    """
 
     def __init__(self, caminho_db: str = "schulz_calibracao.db"):
         self.caminho_db = caminho_db
@@ -403,8 +364,7 @@ class ConexaoSQLite:
 
 
 class _DAOBase:
-    """Acesso a dados isolado das classes de domínio (padrão DAO)."""
-
+    
     def __init__(self, caminho_db: str = "schulz_calibracao.db"):
         self.caminho_db = caminho_db
 
@@ -560,10 +520,6 @@ class EquipamentoDAO(_DAOBase):
 class MedicaoDAO(_DAOBase):
 
     def inserir(self, medicao: Medicao) -> Medicao:
-        """
-        Grava a medição. `media`, `desvio_padrao` e `status` vêm do objeto,
-        já calculados — o CHECK do DDL rejeitaria status nulo.
-        """
         sql = (
             "INSERT INTO medicao (id_equipamento, id_tecnico, data_medicao, "
             "parametro, valor_nominal, tol_mais, tol_menos, medida1, medida2, "
