@@ -12,11 +12,6 @@ import os
 import sqlite3
 from datetime import datetime
 
-# ---------------------------------------------------------------------
-# Python não permite `import` de módulo cujo nome começa com número.
-# Carregamos o 04_classes.py dinamicamente para cumprir a nomenclatura
-# exigida pelo roteiro sem renomear o arquivo.
-# ---------------------------------------------------------------------
 _spec = importlib.util.spec_from_file_location("classes_04", "04_classes.py")
 _classes = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_classes)
