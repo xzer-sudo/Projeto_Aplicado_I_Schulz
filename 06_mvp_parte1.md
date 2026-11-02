@@ -155,7 +155,7 @@ Representa a tabela `tecnico`, que armazena tanto os metrologistas executantes q
 | `_nome` | str | Sim (NOT NULL) | Obrigatório, sem espaços nas extremidades |
 | `_papel` | str | Sim (CHECK) | Convertido para maiúsculas e validado contra lista fechada |
 | `_nome_setor` | str | Sim (NOT NULL) | Obrigatório; exposto também pela propriedade `setor` |
-| `_matricula` | str | **Não** | Atributo de domínio opcional (ver seção 7.2) |
+| `_matricula` | str | **Não** | Atributo de domínio opcional (ver seção 8.2) |
 
 ### 3.2 Classe `Equipamento`
 
@@ -471,11 +471,10 @@ Assim, o requisito de nomenclatura é atendido sem renomear o arquivo nem criar 
 | Documentação técnica com padrões de POO | Este documento | Seções 3, 4 e 8 |
 | Diagramação UML das classes | Diagrama Mermaid | Seção 2.3 |
 | Tratamento de erros SQL | Duas famílias de exceções e rollback automático | Seção 7 |
-| Versionamento em GitHub | Repositório público com todos os arquivos | Seção 10 |
 
 ---
 
-## 11. Conclusão
+## 9. Conclusão
 
 As três entidades do domínio foram implementadas com encapsulamento estrito, validação de estado no construtor e propriedades somente leitura; a regra metrológica de classificação foi encapsulada na classe `Medicao` e executada antes de qualquer comando SQL, respeitando a restrição `CHECK` do banco; e o acesso ao SQLite foi isolado em objetos de acesso a dados com comandos parametrizados e rollback automático.
 
