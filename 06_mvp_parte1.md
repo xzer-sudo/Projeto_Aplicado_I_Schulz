@@ -475,30 +475,6 @@ Assim, o requisito de nomenclatura é atendido sem renomear o arquivo nem criar 
 
 ---
 
-## 9. Pendências e próximos passos
-
-O escopo desta entrega é a Parte 1 do MVP, conforme delimitação do roteiro. As pendências abaixo são conscientes e estão registradas para a continuidade do projeto.
-
-- Inclusão da coluna `matricula` na tabela `tecnico`, com restrição `UNIQUE`, para persistir o atributo hoje mantido apenas em memória.
-- Elevação de `media` e `desvio_padrao` para `NOT NULL` no DDL, com `CHECK`, reforçando no banco a garantia já assegurada pela camada de domínio.
-- Evolução do modelo de três tabelas para o modelo unificado de nove tabelas especificado na AV01, contemplando funcionários, fornecedores, setores clientes, equipamentos padrão, tipos de medição, componentes de incerteza, critérios de aceitação e certificados.
-- Implementação do cálculo de incerteza de medição combinada, graus de liberdade efetivos, fator de abrangência e incerteza expandida (RF03).
-- Importação direta do relatório exportado pelo Calypso, eliminando a transcrição manual descrita na AV01 (RF01).
-- Geração automática do certificado de calibração em PDF no leiaute da Schulz (RF06).
-- Interface de usuário e controle de acesso por perfil, hoje ausentes por se tratar de um MVP executado em terminal.
-
----
-
-## 10. Repositório GitHub
-
-Os arquivos do projeto estão disponíveis em repositório público, com histórico de commits que documenta a evolução desde a modelagem até a implementação das classes.
-
-**Link:** https://github.com/gladsongoulart-ops/projeto-aplicado-1
-
-**Estrutura:** `03_banco.sql`, `executar_banco.py`, `04_classes.py`, `05_main.py`, `06_mvp_parte1.md` e `README.md` com instruções de execução.
-
----
-
 ## 11. Conclusão
 
 As três entidades do domínio foram implementadas com encapsulamento estrito, validação de estado no construtor e propriedades somente leitura; a regra metrológica de classificação foi encapsulada na classe `Medicao` e executada antes de qualquer comando SQL, respeitando a restrição `CHECK` do banco; e o acesso ao SQLite foi isolado em objetos de acesso a dados com comandos parametrizados e rollback automático.
